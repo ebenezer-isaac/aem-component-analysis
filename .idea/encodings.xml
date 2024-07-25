@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/acrolinx/acrolinx.installer/src/main/content" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/acrolinx/acrolinx.installer/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/acrolinx/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/acrolinx/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/all/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/all/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/it.tests/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/it.tests/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/ui.apps.structure/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/ui.apps.structure/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/ui.apps/src/main/content/jcr_root" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/ui.apps/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/ui.config/src/content/jcr_root" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/ui.config/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/ui.content/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/ui.content/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/ui.frontend.idl/src/main/content/jcr_root" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/ui.frontend.idl/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/ui.tests/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ibm-cms-cloud/ui.tests/src/main/resources" charset="UTF-8" />
+  </component>
+</project>

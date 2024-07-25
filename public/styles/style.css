@@ -1,0 +1,36 @@
+/* styles.css */
+
+#locationForm {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+#locationForm label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+#locationForm input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+#locationForm input[type="button"] {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007BFF;
+  color: white;
+  cursor: pointer;
+}
+
+#locationForm input[type="button"]:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

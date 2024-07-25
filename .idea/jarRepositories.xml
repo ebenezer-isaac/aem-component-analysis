@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteRepositoriesConfiguration">
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Central Repository" />
+      <option name="url" value="https://repo.maven.apache.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="ibm-roks-nexus.tugboat" />
+      <option name="name" value="IBM ROKS Nexus Tugboat" />
+      <option name="url" value="https://nexus2.chq-np2-mgmt-ocp-9be65e382aa0ad0d00d39971d16475d5-0000.us-south.containers.appdomain.cloud/repository/maven-releases/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven" />
+      <option name="name" value="maven" />
+      <option name="url" value="https://oss.sonatype.org/content/repositories/snapshots/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="adobe-public-releases" />
+      <option name="name" value="Adobe Public Repository" />
+      <option name="url" value="https://repo.adobe.com/nexus/content/groups/public" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="local-repo" />
+      <option name="name" value="Repository" />
+      <option name="url" value="file:nonadobedependencies" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="ibm-roks-nexus" />
+      <option name="name" value="IBM ROKS Nexus" />
+      <option name="url" value="https://dev:k0k#1TR16#FG@nexus2.chq-np2-mgmt-ocp-9be65e382aa0ad0d00d39971d16475d5-0000.us-south.containers.appdomain.cloud/repository/maven-releases/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Maven Central repository" />
+      <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="jboss.community" />
+      <option name="name" value="JBoss Community repository" />
+      <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="adobe-aem-releases" />
+      <option name="name" value="Adobe AEM Repository" />
+      <option name="url" value="https://downloads.experiencecloud.adobe.com/content/maven/public" />
+    </remote-repository>
+  </component>
+</project>

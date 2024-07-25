@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="adobe-cms.ui.apps.structure" />
+        <module name="adobe-cms.it.tests" />
+        <module name="adobe-cms.ui.tests" />
+        <module name="adobe-cms.ui.content" />
+        <module name="adobe-cms.all.all" />
+        <module name="adobe-cms.acrolinx.installer" />
+        <module name="adobe-cms.ui.apps" />
+        <module name="adobe-cms.ui.config" />
+        <module name="adobe-cms.core" />
+      </profile>
+    </annotationProcessing>
+  </component>
+</project>
