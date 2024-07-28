@@ -1,10 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Analysis Result</title>
-  <link rel="stylesheet" type="text/css" href="/styles/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Analysis</title>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
 </head>
 <body>
-  <h1>Location: <%= location %></h1>
+  <h1>File Analysis for <%= location %></h1>
+  <table id="resultTable" class="display">
+    <thead>
+      <tr>
+        <th>File Path</th>
+        <th>Category</th>
+        <th>Title</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Rows will be dynamically added here -->
+    </tbody>
+  </table>
+
+  <script>
+    $(document).ready(function() {
+      const data = <%- JSON.stringify(data) %>;
+
+      const $tableBody = $('#resultTable tbody');
+      for (const [filePath, details] of Object.entries(data)) {
+        const row = $('<tr>');
+        const filePathCell = $('<td>').text(filePath);
+        const categoryCell = $('<td>').text(details.category || 'N/A');
+        const titleCell = $('<td>').text(details.title || 'N/A');
+
+        row.append(filePathCell).append(categoryCell).append(titleCell);
+        $tableBody.append(row);
+      }
+
+      $('#resultTable').DataTable(); // Initialize DataTables plugin
+    });
+  </script>
 </body>
 </html>
