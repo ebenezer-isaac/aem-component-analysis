@@ -12,14 +12,15 @@ const fileSearcher = new FileSearcher(fileSearcherConfig);
 // Function to define search configuration
 const searchConfig = {
   'content.xml': [
-    { key: 'category', pattern: new RegExp('componentGroup\\s*=\\s*"([^"]+)"'), cleaning: 'quotations' },
-    { key: 'title', pattern: new RegExp('jcr:title\\s*=\\s*"([^"]+)"'), cleaning: 'quotations' },
-    { key: 'resourceSuperType', pattern: new RegExp('sling:resourceSuperType\\s*=\\s*"([^"]+)"'), cleaning: 'quotations' }
+    { key: 'category', pattern: new RegExp('componentGroup\\s*=\\s*["\']([^"\']+)["\']'), cleaning: 'singleQuotations' },
+    { key: 'title', pattern: new RegExp('jcr:title\\s*=\\s*["\']([^"\']+)["\']'), cleaning: 'singleQuotations' },
+    { key: 'resourceSuperType', pattern: new RegExp('sling:resourceSuperType\\s*=\\s*["\']([^"\']+)["\']'), cleaning: 'singleQuotations' }
   ],
   '.html': [
-    { key: 'ddsTags', pattern: new RegExp('<(dds-[a-zA-Z0-9-]+)', 'g'), cleaning: 'tags' },
-    { key: 'caemTags', pattern: new RegExp('<(caem-[a-zA-Z0-9-]+)', 'g'), cleaning: 'tags' },
-    { key: 'carbonImport', pattern: new RegExp("@\\s*attributeName\\s*=\\s*'([^']+)'"), cleaning: 'quotations' }
+    { key: 'ddsTags', pattern: new RegExp('<(dds-[a-zA-Z0-9-]+)', 'g'), cleaning: 'tags', unique: true },
+    { key: 'caemTags', pattern: new RegExp('<(caem-[a-zA-Z0-9-]+)', 'g'), cleaning: 'tags', unique: true },
+    { key: 'carbonImport', pattern: new RegExp('attributeName\\s*=\\s*["\']([^"\']+)["\']', 'g'), cleaning: 'multipleQuotations', unique: true },
+    { key: 'resourceType', pattern: new RegExp("resourceType\\s*=\\s*['\"\\s]([^'\"]+)['\"\\s]", 'g'), cleaning: 'multipleQuotations', unique: true }
   ]
 };
 
@@ -35,19 +36,24 @@ const searchConfig = {
 
 // Cleaning functions dictionary
 const cleaningFunctions = {
-  quotations: (match, pattern) => {
+  // Handles single values by trimming quotes
+  singleQuotations: (match, pattern) => {
     const regexResult = match.match(pattern);
-    return regexResult ? regexResult[1] : '';
+    return regexResult ? regexResult[1].replace(/^['"]|['"]$/g, '') : ''; // Remove quotes
   },
+
+  // Handles multiple values by trimming quotes from each
+  multipleQuotations: (match, pattern) => {
+    const regexResult = [...match.matchAll(pattern)];
+    return regexResult.map(result => result[1].replace(/^['"]|['"]$/g, '')).join(', '); // Remove quotes and join values
+  },
+
   tags: (match, pattern) => {
-    // Use the pattern to extract the tag name directly
-    console.log(match, pattern)
     const tagMatch = pattern.exec(match);
-    console.log(tagMatch)
-    console.log(tagMatch ? tagMatch[1] : '')
     return tagMatch ? tagMatch[1] : ''; // Extract the first capturing group
   }
 };
+
 
 // Function to search component files and process results
 async function searchAndProcessComponentFiles(fileSearcher, componentDir, searchConfig) {
@@ -95,14 +101,18 @@ async function searchAndProcessComponentFiles(fileSearcher, componentDir, search
 function ensureUniqueTags(componentData, searchConfig) {
   for (const componentDirData of Object.values(componentData)) {
     for (const patterns of Object.values(searchConfig)) {
-      for (const { key, cleaning } of patterns) {
-        if (cleaning === 'tags' && componentDirData[key]) {
-          componentDirData[key] = [...new Set(componentDirData[key])];
+      for (const { key, cleaning, unique } of patterns) {
+        if (unique && componentDirData[key]) {
+          // Apply uniqueness only for array values
+          if (Array.isArray(componentDirData[key])) {
+            componentDirData[key] = [...new Set(componentDirData[key])];
+          }
         }
       }
     }
   }
 }
+
 
 // Function to clean up the results
 function cleanUpResults(results) {
