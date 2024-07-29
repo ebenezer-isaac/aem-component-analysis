@@ -1,15 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const FileSearcher = require('../utils/FileSearcher');
-var fs = require('fs');
+const FilePathHandler = require('../utils/FilePathHandler');
+const fs = require('fs');
 
+// Configuration for FileSearcher
 const fileSearcherConfig = {
     exclusions: ['node_modules', 'widgets']
 };
 
 const fileSearcher = new FileSearcher(fileSearcherConfig);
 
-// Function to define search configuration
+// Define search configuration
 const searchConfig = {
     'content.xml': [
         { key: 'category', pattern: new RegExp('componentGroup\\s*=\\s*["\']([^"\']+)["\']'), cleaning: 'singleQuotations' },
@@ -22,11 +24,8 @@ const searchConfig = {
         { key: 'carbonImport', pattern: new RegExp('attributeName\\s*=\\s*["\']([^"\']+)["\']', 'g'), cleaning: 'multipleQuotations', unique: true },
         { key: 'resourceType', pattern: new RegExp("resourceType\\s*=\\s*['\"\\s]([^'\"]+)['\"\\s]", 'g'), cleaning: 'multipleQuotations', unique: true },
         { key: 'dynamicDataSlyUse', pattern: /data-sly-use\.\w+\s*=\s*["'](\/apps[^"']*)["']/g, cleaning: 'multipleQuotations', unique: true }
-
     ]
 };
-
-
 
 // Extract headers based on searchConfig
 const headers = new Set();
@@ -56,7 +55,6 @@ const cleaningFunctions = {
         return tagMatch ? tagMatch[1] : ''; // Extract the first capturing group
     }
 };
-
 
 // Function to search component files and process results
 async function searchAndProcessComponentFiles(fileSearcher, componentDir, searchConfig) {
@@ -96,8 +94,6 @@ async function searchAndProcessComponentFiles(fileSearcher, componentDir, search
         }
     }
 
-
-
     return componentData;
 }
 
@@ -117,7 +113,6 @@ function ensureUniqueTags(componentData, searchConfig) {
         }
     }
 }
-
 
 // Function to clean up the results
 function cleanUpResults(results) {
@@ -147,8 +142,6 @@ router.post('/', async(req, res) => {
         return res.status(400).send('Location is required.');
     }
 
-
-
     try {
         // Initial search for directories containing components
         const initialComponentPattern = new RegExp('jcr:primaryType\\s*=\\s*"cq:Component"');
@@ -168,13 +161,19 @@ router.post('/', async(req, res) => {
         // Ensure unique matches for all keys with 'tags' cleaning configuration
         ensureUniqueTags(componentsData, searchConfig);
 
-        // Clean up the results before rendering
+        // Clean up the results before processing
         const cleanedComponentsData = cleanUpResults(componentsData);
-        fs.writeFile("component_data.json", JSON.stringify(cleanedComponentsData), function(err) {
+
+        // Use FilePathHandler to process file paths
+        const filePathHandler = new FilePathHandler(cleanedComponentsData, Array.from(headers));
+        const processedData = filePathHandler.processFilePaths();
+
+        fs.writeFile("component_data.json", JSON.stringify(processedData), function(err) {
             if (err) throw err;
-            console.log('data save  complete');
+            console.log('Data save complete');
         });
-        res.render('performAnalysis', { location, data: cleanedComponentsData, searchConfig, headers: Array.from(headers) });
+
+        res.render('performAnalysis', { location, data: processedData, searchConfig, headers: Array.from(headers) });
     } catch (error) {
         console.error('Error during file search:', error);
         res.status(500).send(`An error occurred while performing the analysis: ${error.message}`);

@@ -6,91 +6,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AEM Components</title>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        table.dataTable {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        table.dataTable thead th {
-            background-color: #f2f2f2;
-            color: #333;
-            font-weight: bold;
-        }
-        
-        table.dataTable tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        
-        table.dataTable tbody tr:hover {
-            background-color: #e0e0e0;
-        }
-        
-        table.dataTable td,
-        table.dataTable th {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.2/css/buttons.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.2/js/buttons.colVis.min.js"></script>
+    <style>
+        .table-container {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
     <h1>AEM Component Analysis for
         <%= location %>
     </h1>
-    <table id="resultTable" class="display">
-        <thead>
-            <tr>
-                <th>File Path</th>
-                <% headers.forEach(header => { %>
-                    <th>
-                        <%= header %>
-                    </th>
-                    <% }); %>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Rows will be dynamically added here -->
-        </tbody>
-    </table>
 
+    <!-- Dropdown to select table type -->
+    <select id="tableTypeDropdown">
+        <option value="resultTable">Result Table</option>
+        <option value="usageCount">Usage Count</option>
+    </select>
+
+    <!-- Div for Result Table -->
+    <div id="resultTableContainer" class="table-container">
+        <table id="resultTable" class="display">
+            <thead>
+                <tr>
+                    <th>File Path</th>
+                    <% headers.forEach(header => { %>
+                        <th>
+                            <%= header %>
+                        </th>
+                        <% }); %>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Div for Usage Count Table -->
+    <div id="usageCountContainer" class="table-container">
+        <!-- Dropdown to select header for Usage Count table -->
+        <select id="headerDropdown">
+            <!-- Options will be populated dynamically -->
+        </select>
+
+        <!-- Table to display usage count data -->
+        <table id="usageCountTable" class="display">
+            <thead>
+                <tr>
+                    <th>Unique Value</th>
+                    <th>Usage Count</th>
+                    <th>File Paths</th>
+                    <th>Titles</th>
+                    <th>Category</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Inject server-side data into JavaScript variables -->
     <script>
-        $(document).ready(function() {
-            const data = <%- JSON.stringify(data) %>;
-            const headers = <%- JSON.stringify(headers) %>;
-
-            const $tableBody = $('#resultTable tbody');
-            for (const [filePath, details] of Object.entries(data)) {
-                const row = $('<tr>');
-                const filePathCell = $('<td>').text(filePath);
-
-                // Add cells for each header
-                headers.forEach(header => {
-                    const cell = $('<td>').text(details[header] || 'N/A');
-                    row.append(cell);
-                });
-
-                row.prepend(filePathCell); // Add filePath cell as the first cell
-                $tableBody.append(row);
-            }
-
-            $('#resultTable').DataTable(); // Initialize DataTables plugin
-        });
+        const data = <%- JSON.stringify(data) %>;
+        const headers = <%- JSON.stringify(headers) %>;
     </script>
+
+    <!-- Include external JavaScript file -->
+    <script src="/scripts/dataTables.js"></script>
 </body>
 
 </html>
