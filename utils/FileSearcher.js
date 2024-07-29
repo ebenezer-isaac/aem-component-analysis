@@ -3,35 +3,43 @@ const path = require('path');
 const { Sema } = require('async-sema');
 
 class FileSearcher {
-  constructor() {
+  constructor(config = {}) {
     this.readSemaphore = new Sema(5); // Initialize with 5 permits, adjust as needed
+    this.exclusions = config.exclusions || [];
   }
 
-  // Iterative function to get all files in a directory
+  // Helper function to check if a path should be excluded
+  shouldExclude(filePath) {
+    filePath = String(filePath)
+    // Check if any part of the path matches an exclusion pattern
+    const isExcluded = this.exclusions.some(pattern => {
+      const match = filePath.includes(pattern);
+      return match;
+    });
+    return isExcluded;
+  }
+
+  // Recursive function to get all files in a directory
   async getFilesInDirectory(directory) {
     const files = [];
-    const stack = [directory];
-    const visited = new Set();
-
-    while (stack.length > 0) {
-      const currentDir = stack.pop();
-      if (visited.has(currentDir)) continue;
-      visited.add(currentDir);
-
-      try {
-        const entries = await fs.readdir(currentDir, { withFileTypes: true });
-
-        for (const entry of entries) {
-          const entryPath = path.join(currentDir, entry.name);
-          if (entry.isDirectory()) {
-            stack.push(entryPath);
-          } else {
-            files.push(entryPath);
-          }
-        }
-      } catch (error) {
-        console.error(`Error reading directory: ${currentDir}`, error);
+    try {
+      // Skip this directory if it matches any exclusion pattern
+      if (this.shouldExclude(directory)) {
+        return files;
       }
+
+      const entries = await fs.readdir(directory, { withFileTypes: true });
+      for (const entry of entries) {
+        const entryPath = path.join(directory, entry.name);
+        if (entry.isDirectory()) {
+          // Recurse into subdirectories
+          files.push(...await this.getFilesInDirectory(entryPath));
+        } else {
+          files.push(entryPath);
+        }
+      }
+    } catch (error) {
+      console.error(`Error reading directory: ${directory}`, error);
     }
 
     return files;
@@ -57,10 +65,8 @@ class FileSearcher {
 
       for (const [key, values] of Object.entries(data)) {
         if (values.length > 0) {
-          // Remove empty strings and empty arrays
           cleanedResults[filePath][key] = values.filter(value => value.trim() !== '');
         } else {
-          // Only include keys with non-empty values
           cleanedResults[filePath][key] = [];
         }
       }
@@ -77,6 +83,7 @@ class FileSearcher {
     const searchInFile = async (filePath) => {
       await this.readSemaphore.acquire();
       try {
+        console.log(`Searching file: ${filePath}`);
         const content = await fs.readFile(filePath, 'utf8');
         const fileMatches = {};
 
@@ -100,13 +107,14 @@ class FileSearcher {
 
     try {
       const isFilePath = await this.isFile(directoryPath);
-
       if (isFilePath) {
         await searchInFile(directoryPath);
       } else {
         const files = await this.getFilesInDirectory(directoryPath);
         const filteredFiles = filenameMask
-          ? files.filter(file => path.extname(file) === filenameMask)
+          ? files.filter(file => {
+              return path.extname(file).includes(filenameMask);
+            })
           : files;
 
         const searchPromises = filteredFiles.map(file => searchInFile(file));

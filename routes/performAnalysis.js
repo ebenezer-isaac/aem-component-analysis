@@ -2,6 +2,13 @@ const express = require('express');
 const router = express.Router();
 const FileSearcher = require('../utils/FileSearcher');
 
+const fileSearcherConfig = {
+  exclusions: ['node_modules']
+};
+
+const fileSearcher = new FileSearcher(fileSearcherConfig);
+
+
 // Function to define search configuration
 function getComponentSearchConfig() {
   return {
@@ -94,12 +101,11 @@ router.post('/', async (req, res) => {
   }
 
   const searchConfig = getComponentSearchConfig();
-  const fileSearcher = new FileSearcher();
 
   try {
     // Initial search for directories containing components
     const initialComponentPattern = new RegExp('jcr:primaryType\\s*=\\s*"cq:Component"');
-    const componentDirsData = await fileSearcher.searchFiles(location, [initialComponentPattern]);
+    const componentDirsData = await fileSearcher.searchFiles(location, [initialComponentPattern], "content.xml");
     const componentDirs = Object.keys(componentDirsData);
 
     const componentsData = {};
