@@ -77,6 +77,7 @@ class FileSearcher {
 
   // Search files in a directory with the given regex patterns and file mask
   async searchFiles(directoryPath, regexArray, filenameMask = '') {
+  console.log(directoryPath, regexArray, filenameMask)
     const result = {};
 
     // Function to search for patterns in a single file
@@ -93,7 +94,6 @@ class FileSearcher {
             fileMatches[regex.source] = matches;
           }
         }
-
         if (Object.keys(fileMatches).length > 0) {
           result[filePath] = fileMatches;
         }

@@ -1,28 +1,37 @@
 const express = require('express');
 const router = express.Router();
 const FileSearcher = require('../utils/FileSearcher');
+var fs = require('fs');
 
 const fileSearcherConfig = {
-  exclusions: ['node_modules']
+  exclusions: ['node_modules', 'widgets']
 };
 
 const fileSearcher = new FileSearcher(fileSearcherConfig);
 
-
 // Function to define search configuration
-function getComponentSearchConfig() {
-  return {
-    'context.xml': [
-      { key: 'category', pattern: new RegExp('componentGroup\\s*=\\s*"([^"]+)"'), cleaning: 'quotations' },
-      { key: 'title', pattern: new RegExp('jcr:title\\s*=\\s*"([^"]+)"'), cleaning: 'quotations' },
-      { key: 'resourceSuperType', pattern: new RegExp('sling:resourceSuperType\\s*=\\s*"([^"]+)"'), cleaning: 'quotations' }
-    ],
-    '*.html': [
-      { key: 'ddsTags', pattern: new RegExp('<(dds-[a-zA-Z0-9-]+)', 'g'), cleaning: 'tags' },
-      { key: 'caemTags', pattern: new RegExp('<(caem-[a-zA-Z0-9-]+)', 'g'), cleaning: 'tags' }
-    ]
-  };
-}
+const searchConfig = {
+  'content.xml': [
+    { key: 'category', pattern: new RegExp('componentGroup\\s*=\\s*"([^"]+)"'), cleaning: 'quotations' },
+    { key: 'title', pattern: new RegExp('jcr:title\\s*=\\s*"([^"]+)"'), cleaning: 'quotations' },
+    { key: 'resourceSuperType', pattern: new RegExp('sling:resourceSuperType\\s*=\\s*"([^"]+)"'), cleaning: 'quotations' }
+  ],
+  '.html': [
+    { key: 'ddsTags', pattern: new RegExp('<(dds-[a-zA-Z0-9-]+)', 'g'), cleaning: 'tags' },
+    { key: 'caemTags', pattern: new RegExp('<(caem-[a-zA-Z0-9-]+)', 'g'), cleaning: 'tags' },
+    { key: 'carbonImport', pattern: new RegExp("@\\s*attributeName\\s*=\\s*'([^']+)'"), cleaning: 'quotations' }
+  ]
+};
+
+
+
+  // Extract headers based on searchConfig
+  const headers = new Set();
+  for (const patterns of Object.values(searchConfig)) {
+    for (const { key } of patterns) {
+      headers.add(key);
+    }
+  }
 
 // Cleaning functions dictionary
 const cleaningFunctions = {
@@ -30,9 +39,13 @@ const cleaningFunctions = {
     const regexResult = match.match(pattern);
     return regexResult ? regexResult[1] : '';
   },
-  tags: (match) => {
-    const tagName = match.match(/<(dds-[a-zA-Z0-9-]+)|(caem-[a-zA-Z0-9-]+)/);
-    return tagName ? tagName[0].substring(1) : '';
+  tags: (match, pattern) => {
+    // Use the pattern to extract the tag name directly
+    console.log(match, pattern)
+    const tagMatch = pattern.exec(match);
+    console.log(tagMatch)
+    console.log(tagMatch ? tagMatch[1] : '')
+    return tagMatch ? tagMatch[1] : ''; // Extract the first capturing group
   }
 };
 
@@ -42,19 +55,38 @@ async function searchAndProcessComponentFiles(fileSearcher, componentDir, search
 
   for (const [fileMask, patterns] of Object.entries(searchConfig)) {
     const fileData = await fileSearcher.searchFiles(componentDir, patterns.map(p => p.pattern), fileMask);
+    console.log('fileData:', fileData); // Debugging: Log fileData
 
-    for (const { key, pattern, cleaning } of patterns) {
-      const matches = fileData[componentDir]?.[pattern.source] || [];
-      const matchResults = matches.map(match => cleaningFunctions[cleaning](match, pattern));
+    if (Object.keys(fileData).length > 0) {
+      for (const { key, pattern, cleaning } of patterns) {
+        // Find the correct fileData key that matches componentDir
+        const fileDataKey = Object.keys(fileData).find(filePath => filePath.includes(componentDir));
 
-      if (matchResults.length > 0) {
-        if (!componentData[key]) {
-          componentData[key] = [];
+        if (fileDataKey) {
+          // Ensure pattern.source exists in fileData[fileDataKey]
+          if (fileData[fileDataKey][pattern.source]) {
+            const matches = fileData[fileDataKey][pattern.source];
+
+            console.log('Cleaning function:', cleaning, 'Matches:', matches);
+            const matchResults = matches.map(match => cleaningFunctions[cleaning](match, pattern)).filter(result => result.trim() !== '');
+            console.log('Match Results:', matchResults);
+            if (matchResults.length > 0) {
+              if (!componentData[key]) {
+                componentData[key] = [];
+              }
+              componentData[key].push(...matchResults);
+            }
+          } else {
+            console.warn(`Pattern source ${pattern.source} not found in fileData[${fileDataKey}]`);
+          }
+        } else {
+          console.warn(`No matching key found in fileData for componentDir ${componentDir}`);
         }
-        componentData[key].push(...matchResults);
       }
     }
   }
+
+
 
   return componentData;
 }
@@ -100,7 +132,7 @@ router.post('/', async (req, res) => {
     return res.status(400).send('Location is required.');
   }
 
-  const searchConfig = getComponentSearchConfig();
+
 
   try {
     // Initial search for directories containing components
@@ -110,7 +142,8 @@ router.post('/', async (req, res) => {
 
     const componentsData = {};
 
-    for (const componentDir of componentDirs) {
+    for (let componentDir of componentDirs) {
+      componentDir = componentDir.split("\\").slice(0, -1).join("\\"); // Remove the file name part
       const componentData = await searchAndProcessComponentFiles(fileSearcher, componentDir, searchConfig);
       if (Object.keys(componentData).length > 0) { // Only add non-empty component data
         componentsData[componentDir] = componentData;
@@ -122,8 +155,12 @@ router.post('/', async (req, res) => {
 
     // Clean up the results before rendering
     const cleanedComponentsData = cleanUpResults(componentsData);
-
-    res.render('performAnalysis', { location, data: cleanedComponentsData });
+    fs.writeFile ("component_data.json", JSON.stringify(cleanedComponentsData), function(err) {
+        if (err) throw err;
+        console.log('data save  complete');
+        }
+    );
+    res.render('performAnalysis', { location, data: cleanedComponentsData, searchConfig, headers: Array.from(headers) });
   } catch (error) {
     console.error('Error during file search:', error);
     res.status(500).send(`An error occurred while performing the analysis: ${error.message}`);

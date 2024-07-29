@@ -14,8 +14,9 @@
     <thead>
       <tr>
         <th>File Path</th>
-        <th>Category</th>
-        <th>Title</th>
+        <% headers.forEach(header => { %>
+          <th><%= header %></th>
+        <% }); %>
       </tr>
     </thead>
     <tbody>
@@ -26,15 +27,20 @@
   <script>
     $(document).ready(function() {
       const data = <%- JSON.stringify(data) %>;
+      const headers = <%- JSON.stringify(headers) %>;
 
       const $tableBody = $('#resultTable tbody');
       for (const [filePath, details] of Object.entries(data)) {
         const row = $('<tr>');
         const filePathCell = $('<td>').text(filePath);
-        const categoryCell = $('<td>').text(details.category || 'N/A');
-        const titleCell = $('<td>').text(details.title || 'N/A');
 
-        row.append(filePathCell).append(categoryCell).append(titleCell);
+        // Add cells for each header
+        headers.forEach(header => {
+          const cell = $('<td>').text(details[header] || 'N/A');
+          row.append(cell);
+        });
+
+        row.prepend(filePathCell); // Add filePath cell as the first cell
         $tableBody.append(row);
       }
 
