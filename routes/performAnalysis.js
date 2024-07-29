@@ -20,7 +20,9 @@ const searchConfig = {
         { key: 'ddsTags', pattern: new RegExp('<(dds-[a-zA-Z0-9-]+)', 'g'), cleaning: 'tags', unique: true },
         { key: 'caemTags', pattern: new RegExp('<(caem-[a-zA-Z0-9-]+)', 'g'), cleaning: 'tags', unique: true },
         { key: 'carbonImport', pattern: new RegExp('attributeName\\s*=\\s*["\']([^"\']+)["\']', 'g'), cleaning: 'multipleQuotations', unique: true },
-        { key: 'resourceType', pattern: new RegExp("resourceType\\s*=\\s*['\"\\s]([^'\"]+)['\"\\s]", 'g'), cleaning: 'multipleQuotations', unique: true }
+        { key: 'resourceType', pattern: new RegExp("resourceType\\s*=\\s*['\"\\s]([^'\"]+)['\"\\s]", 'g'), cleaning: 'multipleQuotations', unique: true },
+        { key: 'dynamicDataSlyUse', pattern: /data-sly-use\.\w+\s*=\s*["'](\/apps[^"']*)["']/g, cleaning: 'multipleQuotations', unique: true }
+
     ]
 };
 
