@@ -1,8 +1,8 @@
 {
-  "dependencies": {
-    "async-sema": "^3.1.1",
-    "ejs": "^3.1.10",
-    "express": "^4.19.2",
-    "fs": "^0.0.1-security"
-  }
+    "dependencies": {
+        "async-sema": "^3.1.1",
+        "ejs": "^3.1.10",
+        "express": "^4.19.2",
+        "fs": "^0.0.1-security"
+    }
 }

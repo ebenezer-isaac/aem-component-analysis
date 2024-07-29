@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>AEM Component Analysis</title>
-  <link rel="stylesheet" type="text/css" href="/styles/style.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>AEM Component Analysis</title>
+    <link rel="stylesheet" type="text/css" href="/styles/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
+
 <body>
-  <form id="locationForm" action="/performAnalysis" method="post">
-    <label for="location">Paste path to AEM Project Folder:</label>
-    <input type="text" id="location" name="location" onkeyup="validateDirectory()">
-    <input type="submit" value="Analyse" id="analyseButton" disabled="true">
-  </form>
-  <script src="/scripts/app.js"></script>
+    <form id="locationForm" action="/performAnalysis" method="post">
+        <label for="location">Paste path to AEM Project Folder:</label>
+        <input type="text" id="location" name="location" onkeyup="validateDirectory()">
+        <input type="submit" value="Analyse" id="analyseButton" disabled="true">
+    </form>
+    <script src="/scripts/app.js"></script>
 </body>
+
 </html>
