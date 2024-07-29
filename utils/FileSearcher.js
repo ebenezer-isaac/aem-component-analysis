@@ -83,7 +83,6 @@ class FileSearcher {
     const searchInFile = async (filePath) => {
       await this.readSemaphore.acquire();
       try {
-        console.log(`Searching file: ${filePath}`);
         const content = await fs.readFile(filePath, 'utf8');
         const fileMatches = {};
 
@@ -113,10 +112,9 @@ class FileSearcher {
         const files = await this.getFilesInDirectory(directoryPath);
         const filteredFiles = filenameMask
           ? files.filter(file => {
-              return path.extname(file).includes(filenameMask);
+              return file.includes(filenameMask);
             })
           : files;
-
         const searchPromises = filteredFiles.map(file => searchInFile(file));
         await Promise.all(searchPromises);
       }
