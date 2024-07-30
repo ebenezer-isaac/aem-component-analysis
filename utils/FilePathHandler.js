@@ -1,5 +1,3 @@
-// utils/FilePathHandler.js
-
 class FilePathHandler {
     constructor(data, headers) {
         this.data = data;

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This Node.js application is designed to search for regex patterns within an Adobe Experience Manager (AEM) project. It analyzes component files, applies regex patterns defined in a configuration file, maps the usage of components and subcomponents, and lists regex patterns by unique values with usage counts. The application is intended to be run on a developer machine and works with an AEM project locally.
+This Node.js application is designed to search for regex patterns within an Adobe Experience Manager (AEM) project. It analyzes component files, applies regex patterns according to configuration, maps the usage of components and subcomponents, and lists them in data tables. 
 
 ## Features
 

@@ -1,4 +1,11 @@
 {
+    "name": "aem-component-analysis",
+    "version": "1.0.0",
+    "description": "Search for regex patterns within an AEM project and analyzes component files",
+    "main": "index.js",
+    "scripts": {
+        "start": "node app.js"
+    },
     "dependencies": {
         "async-sema": "^3.1.1",
         "ejs": "^3.1.10",
