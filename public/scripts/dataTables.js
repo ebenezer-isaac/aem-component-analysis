@@ -30,7 +30,6 @@ $(document).ready(function() {
             data: data,
             columns: columns,
             pageLength: pageLength, // Set page length
-            dom: 'Bfrtip',
             buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             search: {
                 caseInsensitive: false
@@ -48,7 +47,7 @@ $(document).ready(function() {
         });
     }
 
-    function updateUsageCountTable(selectedHeader) {
+    function updateUsageCountTable(selectedHeader, pageLength) {
         if (!data) {
             console.warn('Data is not available for usage count table.');
             return;
@@ -111,8 +110,7 @@ $(document).ready(function() {
                 { title: 'Titles' },
                 { title: 'Category' }
             ],
-            pageLength: defaultPageLength, // Set default page length
-            dom: 'Bfrtip',
+            pageLength: pageLength, // Set page length
             buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             search: {
                 caseInsensitive: false // Make search case sensitive
@@ -126,30 +124,37 @@ $(document).ready(function() {
         const selectedTable = $(this).val();
         $('.table-container').hide();
         $(`#${selectedTable}Container`).show();
+
+        const pageLength = parseInt($('#pageLengthDropdown').val(), 10) || defaultPageLength;
+
         if (selectedTable === 'usageCount') {
             populateHeaderDropdown();
             $('#resultTable').DataTable().clear().destroy();
             if (currentHeaderValue == null) {
                 $('#headerDropdown').val(defaultHeaderValue);
                 currentHeaderValue = defaultHeaderValue;
-                updateUsageCountTable(currentHeaderValue);
+                updateUsageCountTable(currentHeaderValue, pageLength);
+            } else {
+                updateUsageCountTable(currentHeaderValue, pageLength);
             }
         } else if (selectedTable === 'resultTable') {
-            const pageLength = parseInt($('#pageLengthDropdown').val(), 10);
             populateResultTable(pageLength);
             $('#usageCountTable').DataTable().clear().destroy();
         }
     });
 
     $('#headerDropdown').on('change', function() {
+        const pageLength = parseInt($('#pageLengthDropdown').val(), 10) || defaultPageLength;
         currentHeaderValue = $(this).val();
-        updateUsageCountTable(currentHeaderValue);
+        updateUsageCountTable(currentHeaderValue, pageLength);
     });
 
     $('#pageLengthDropdown').on('change', function() {
-        const pageLength = parseInt($(this).val(), 10);
+        const pageLength = parseInt($(this).val(), 10) || defaultPageLength;
         if ($('#tableTypeDropdown').val() === 'resultTable') {
             populateResultTable(pageLength);
+        } else {
+            updateUsageCountTable(currentHeaderValue, pageLength);
         }
     });
 

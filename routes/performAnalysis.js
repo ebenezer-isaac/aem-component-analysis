@@ -37,7 +37,6 @@ async function searchAndProcessComponentFiles(fileSearcher, componentDir, search
 
     for (const [fileMask, patterns] of Object.entries(searchConfig)) {
         const fileData = await fileSearcher.searchFiles(componentDir, patterns.map(p => p.pattern), fileMask);
-        console.log('fileData:', fileData); // Debugging: Log fileData
 
         if (Object.keys(fileData).length > 0) {
             for (const { key, pattern, cleaning }
@@ -49,10 +48,7 @@ async function searchAndProcessComponentFiles(fileSearcher, componentDir, search
                     // Ensure pattern.source exists in fileData[fileDataKey]
                     if (fileData[fileDataKey][pattern.source]) {
                         const matches = fileData[fileDataKey][pattern.source];
-
-                        console.log('Cleaning function:', cleaning, 'Matches:', matches);
                         const matchResults = matches.map(match => cleaningFunctions[cleaning](match, pattern)).filter(result => result.trim() !== '');
-                        console.log('Match Results:', matchResults);
                         if (matchResults.length > 0) {
                             if (!componentData[key]) {
                                 componentData[key] = [];
@@ -60,7 +56,7 @@ async function searchAndProcessComponentFiles(fileSearcher, componentDir, search
                             componentData[key].push(...matchResults);
                         }
                     } else {
-                        console.warn(`Pattern source ${pattern.source} not found in fileData[${fileDataKey}]`);
+                        //console.warn(`Pattern source ${pattern.source} not found in fileData[${fileDataKey}]`);
                     }
                 } else {
                     console.warn(`No matching key found in fileData for componentDir ${componentDir}`);
@@ -184,7 +180,6 @@ router.post('/', async(req, res) => {
 
         fs.writeFile("component_data.json", JSON.stringify(processedData), function(err) {
             if (err) throw err;
-            console.log('Data save complete');
         });
 
         const dataTableData = transformDataForDataTables(processedData, Array.from(headers));

@@ -77,9 +77,7 @@ class FileSearcher {
 
     // Search files in a directory with the given regex patterns and file mask
     async searchFiles(directoryPath, regexArray, filenameMask = '') {
-        console.log(directoryPath, regexArray, filenameMask)
         const result = {};
-
         // Function to search for patterns in a single file
         const searchInFile = async(filePath) => {
             await this.readSemaphore.acquire();
