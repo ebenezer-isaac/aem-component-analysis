@@ -3,16 +3,24 @@
 
 <head>
     <title>AEM Component Analysis</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link rel="stylesheet" type="text/css" href="/styles/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </head>
 
 <body>
-    <form id="locationForm" action="/performAnalysis" method="post">
-        <label for="location">Paste path to AEM Project Folder:</label>
-        <input type="text" id="location" name="location" onkeyup="validateDirectory()">
-        <input type="submit" value="Analyse" id="analyseButton" disabled="true">
-    </form>
+    <div class="container">
+        <h4 class="center-align">AEM Component Analysis</h4>
+        <form id="locationForm" action="/performAnalysis" method="post" class="col s12">
+            <div class="input-field col s12">
+                <label for="location">Paste path to AEM Project Folder:</label>
+                <input type="text" id="location" name="location" onkeyup="validateDirectory()">
+            </div>
+            <button type="submit" class="btn" id="analyseButton" disabled="true">Analyse</button>
+        </form>
+    </div>
     <script src="/scripts/app.js"></script>
 </body>
 

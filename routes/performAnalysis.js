@@ -11,31 +11,6 @@ const fileSearcherConfig = {
 
 const fileSearcher = new FileSearcher(fileSearcherConfig);
 
-// Define search configuration
-const searchConfig = {
-    'content.xml': [
-        { key: 'category', pattern: new RegExp('componentGroup\\s*=\\s*["\']([^"\']+)["\']'), cleaning: 'singleQuotations' },
-        { key: 'title', pattern: new RegExp('jcr:title\\s*=\\s*["\']([^"\']+)["\']'), cleaning: 'singleQuotations' },
-        { key: 'resourceSuperType', pattern: new RegExp('sling:resourceSuperType\\s*=\\s*["\']([^"\']+)["\']'), cleaning: 'singleQuotations' }
-    ],
-    '.html': [
-        { key: 'ddsTags', pattern: new RegExp('<(dds-[a-zA-Z0-9-]+)', 'g'), cleaning: 'tags', unique: true },
-        { key: 'caemTags', pattern: new RegExp('<(caem-[a-zA-Z0-9-]+)', 'g'), cleaning: 'tags', unique: true },
-        { key: 'carbonImport', pattern: new RegExp('attributeName\\s*=\\s*["\']([^"\']+)["\']', 'g'), cleaning: 'multipleQuotations', unique: true },
-        { key: 'resourceType', pattern: new RegExp("resourceType\\s*=\\s*['\"\\s]([^'\"]+)['\"\\s]", 'g'), cleaning: 'multipleQuotations', unique: true },
-        { key: 'dynamicDataSlyUse', pattern: /data-sly-use\.\w+\s*=\s*["'](\/apps[^"']*)["']/g, cleaning: 'multipleQuotations', unique: true }
-    ]
-};
-
-// Extract headers based on searchConfig
-const headers = new Set();
-for (const patterns of Object.values(searchConfig)) {
-    for (const { key }
-        of patterns) {
-        headers.add(key);
-    }
-}
-
 // Cleaning functions dictionary
 const cleaningFunctions = {
     // Handles single values by trimming quotes
@@ -134,15 +109,54 @@ function cleanUpResults(results) {
 
     return cleanedResults;
 }
+// Function to transform data into array format for DataTables
+// Function to transform data into array format for DataTables
+function transformDataForDataTables(data, headers) {
+    // Create an array to hold the rows for DataTables
+    const tableRows = [];
 
+    // Iterate over the data
+    for (const [filePath, details] of Object.entries(data)) {
+        // Prepare a row with the filePath as the first column
+        const row = [filePath];
+
+        // Add each header's value to the row
+        headers.forEach(header => {
+            // Get the cell value, default to empty string if not defined
+            const cellValue = details[header] || '';
+
+            row.push(cellValue);
+        });
+
+        // Push the row to the tableRows array
+        tableRows.push(row);
+    }
+
+    return tableRows;
+}
+
+
+
+
+// Define the route
 router.post('/', async(req, res) => {
     const { location } = req.body;
+    const searchConfig = req.searchConfig; // Retrieve searchConfig from request
+    const headers = new Set(); // Define headers here
 
     if (!location) {
         return res.status(400).send('Location is required.');
     }
 
     try {
+        // Extract headers based on searchConfig
+        for (const patterns of Object.values(searchConfig)) {
+            for (const { key }
+                of patterns) {
+                headers.add(key);
+            }
+        }
+
         // Initial search for directories containing components
         const initialComponentPattern = new RegExp('jcr:primaryType\\s*=\\s*"cq:Component"');
         const componentDirsData = await fileSearcher.searchFiles(location, [initialComponentPattern], "content.xml");
@@ -173,7 +187,9 @@ router.post('/', async(req, res) => {
             console.log('Data save complete');
         });
 
-        res.render('performAnalysis', { location, data: processedData, searchConfig, headers: Array.from(headers) });
+        const dataTableData = transformDataForDataTables(processedData, Array.from(headers));
+        res.render('performAnalysis', { location, data: dataTableData, searchConfig, headers: Array.from(headers) });
+
     } catch (error) {
         console.error('Error during file search:', error);
         res.status(500).send(`An error occurred while performing the analysis: ${error.message}`);

@@ -2,24 +2,23 @@ $(document).ready(function() {
     // Initialize DataTables instances
     let resultTableInitialized = false;
     let usageCountTableInitialized = false;
+    let defaultHeaderValue = 'carbonImport';
+    let currentHeaderValue = null;
 
     function populateResultTable() {
         const $tableBody = $('#resultTable tbody');
         $tableBody.empty();
 
-        for (const [filePath, details] of Object.entries(data)) {
-            const row = $('<tr>');
-            const filePathCell = $('<td>').text(filePath);
-            row.append(filePathCell);
-
-            headers.forEach((header) => {
-                const cellValue = details[header] || '';
-                const cell = $('<td>').text(cellValue);
-                row.append(cell);
-            });
-
-            $tableBody.append(row);
+        if (!data || !headers) {
+            console.warn('Data or headers are not available for result table.');
+            return;
         }
+
+        // Define columns based on headers
+        const columns = [
+            { title: 'File Path' },
+            ...headers.map(header => ({ title: header }))
+        ];
 
         if (resultTableInitialized) {
             $('#resultTable').DataTable().clear().destroy();
@@ -27,11 +26,12 @@ $(document).ready(function() {
 
         $('#resultTable').DataTable({
             dom: 'Bfrtip',
-            buttons: [
-                'copy', 'csv', 'excel', 'pdf', 'print'
-            ],
-            "search": {
-                "caseInsensitive": false
+            data: data,
+            columns: columns,
+            dom: 'Bfrtip',
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            search: {
+                caseInsensitive: false
             }
         });
 
@@ -47,11 +47,27 @@ $(document).ready(function() {
     }
 
     function updateUsageCountTable(selectedHeader) {
+        if (!data) {
+            console.warn('Data is not available for usage count table.');
+            return;
+        }
+
         const usageCount = {};
 
         // Aggregate usage data
-        for (const details of Object.values(data)) {
-            const values = (details[selectedHeader] || '').split(',').map(v => v.trim()).filter(v => v && v !== 'N/A');
+        data.forEach(row => {
+            const filePath = row[0];
+            const details = {};
+            headers.forEach((header, index) => {
+                details[header] = row[index + 1];
+            });
+
+            const rawValues = details[selectedHeader];
+            if (!rawValues) return; // Skip if the header value is not defined
+
+            const values = typeof rawValues === 'string' ?
+                rawValues.split(',').map(v => v.trim()).filter(v => v && v !== 'N/A') : [];
+
             values.forEach(value => {
                 if (!usageCount[value]) {
                     usageCount[value] = {
@@ -62,24 +78,22 @@ $(document).ready(function() {
                     };
                 }
                 usageCount[value].count += 1;
-                usageCount[value].paths.push(details.path);
-                usageCount[value].titles.push(details.title);
-                usageCount[value].categories.push(details.category);
+                usageCount[value].paths.push(filePath);
+                usageCount[value].titles.push(details.title || 'N/A');
+                usageCount[value].categories.push(details.category || 'N/A');
             });
-        }
+        });
+
+        const rows = Object.entries(usageCount).map(([value, info]) => [
+            value,
+            info.count,
+            info.paths.join(', '),
+            info.titles.join(', '),
+            info.categories.join(', ')
+        ]);
 
         const $tableBody = $('#usageCountTable tbody');
         $tableBody.empty();
-        Object.entries(usageCount).forEach(([value, info]) => {
-            const row = $('<tr>');
-            row.append($('<td>').text(value));
-            row.append($('<td>').text(info.count));
-            row.append($('<td>').text(info.paths.join(', ')));
-            row.append($('<td>').text(info.titles.join(', ')));
-            row.append($('<td>').text(info.categories.join(', ')));
-
-            $tableBody.append(row);
-        });
 
         if (usageCountTableInitialized) {
             $('#usageCountTable').DataTable().clear().destroy();
@@ -87,9 +101,16 @@ $(document).ready(function() {
 
         $('#usageCountTable').DataTable({
             dom: 'Bfrtip',
-            buttons: [
-                'copy', 'csv', 'excel', 'pdf', 'print'
-            ]
+            data: rows,
+            columns: [
+                { title: 'Unique Value' },
+                { title: 'Usage Count' },
+                { title: 'File Paths' },
+                { title: 'Titles' },
+                { title: 'Category' }
+            ],
+            dom: 'Bfrtip',
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
         });
 
         usageCountTableInitialized = true;
@@ -101,13 +122,21 @@ $(document).ready(function() {
         $(`#${selectedTable}Container`).show();
         if (selectedTable === 'usageCount') {
             populateHeaderDropdown();
-        } else {
+            $('#resultTable').DataTable().clear().destroy();
+            if (currentHeaderValue == null) {
+                $('#headerDropdown').val(defaultHeaderValue);
+                currentHeadervalue = defaultHeaderValue;
+                updateUsageCountTable(currentHeadervalue);
+            }
+        } else if (selectedTable === 'resultTable') {
             populateResultTable();
+            $('#usageCountTable').DataTable().clear().destroy();
         }
     });
 
     $('#headerDropdown').on('change', function() {
-        updateUsageCountTable($(this).val());
+        currentHeadervalue = $(this).val();
+        updateUsageCountTable(currentHeadervalue);
     });
 
     // Initialize
