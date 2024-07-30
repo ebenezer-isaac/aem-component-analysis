@@ -38,5 +38,5 @@ app.use('/performAnalysis', (req, res, next) => {
 app.use('/', indexRouter);
 
 app.listen(3000, () => {
-    console.log('App listening on port 3000!');
+    console.log('Application Link : http://localhost:3000');
 });

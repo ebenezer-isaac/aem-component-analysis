@@ -33,6 +33,11 @@ $(document).ready(function() {
             buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             search: {
                 caseInsensitive: false
+            },
+            fixedHeader: true,
+            scrollX: true,
+            fixedColumns: {
+                leftColumns: 3
             }
         });
 
@@ -114,6 +119,11 @@ $(document).ready(function() {
             buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             search: {
                 caseInsensitive: false // Make search case sensitive
+            },
+            fixedHeader: true,
+            scrollX: true,
+            fixedColumns: {
+                leftColumns: 1
             }
         });
 
