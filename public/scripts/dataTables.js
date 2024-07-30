@@ -4,8 +4,9 @@ $(document).ready(function() {
     let usageCountTableInitialized = false;
     let defaultHeaderValue = 'carbonImport';
     let currentHeaderValue = null;
+    let defaultPageLength = 50; // Default page length
 
-    function populateResultTable() {
+    function populateResultTable(pageLength) {
         const $tableBody = $('#resultTable tbody');
         $tableBody.empty();
 
@@ -28,6 +29,7 @@ $(document).ready(function() {
             dom: 'Bfrtip',
             data: data,
             columns: columns,
+            pageLength: pageLength, // Set page length
             dom: 'Bfrtip',
             buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             search: {
@@ -109,8 +111,12 @@ $(document).ready(function() {
                 { title: 'Titles' },
                 { title: 'Category' }
             ],
+            pageLength: defaultPageLength, // Set default page length
             dom: 'Bfrtip',
-            buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            search: {
+                caseInsensitive: false // Make search case sensitive
+            }
         });
 
         usageCountTableInitialized = true;
@@ -125,20 +131,29 @@ $(document).ready(function() {
             $('#resultTable').DataTable().clear().destroy();
             if (currentHeaderValue == null) {
                 $('#headerDropdown').val(defaultHeaderValue);
-                currentHeadervalue = defaultHeaderValue;
-                updateUsageCountTable(currentHeadervalue);
+                currentHeaderValue = defaultHeaderValue;
+                updateUsageCountTable(currentHeaderValue);
             }
         } else if (selectedTable === 'resultTable') {
-            populateResultTable();
+            const pageLength = parseInt($('#pageLengthDropdown').val(), 10);
+            populateResultTable(pageLength);
             $('#usageCountTable').DataTable().clear().destroy();
         }
     });
 
     $('#headerDropdown').on('change', function() {
-        currentHeadervalue = $(this).val();
-        updateUsageCountTable(currentHeadervalue);
+        currentHeaderValue = $(this).val();
+        updateUsageCountTable(currentHeaderValue);
+    });
+
+    $('#pageLengthDropdown').on('change', function() {
+        const pageLength = parseInt($(this).val(), 10);
+        if ($('#tableTypeDropdown').val() === 'resultTable') {
+            populateResultTable(pageLength);
+        }
     });
 
     // Initialize
     $('#tableTypeDropdown').val('resultTable').trigger('change');
+    $('#pageLengthDropdown').val(defaultPageLength); // Set default value for page length
 });

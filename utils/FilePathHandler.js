@@ -68,7 +68,7 @@ class FilePathHandler {
             const row = {};
 
             this.headers.forEach((header, index) => {
-                let cellValue = details[header] || 'N/A';
+                let cellValue = details[header] || '--';
                 if (filePathColumns.includes(index + 1)) { // Adjust file paths in identified columns
                     if (Array.isArray(cellValue)) {
                         cellValue = cellValue.map(val => this.adjustFilePath(val, commonPrefix)).join(', ');
