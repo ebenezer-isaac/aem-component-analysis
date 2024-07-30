@@ -21,6 +21,10 @@ const searchConfig = {
     ]
 };
 
+const fileSearcherConfig = {
+    exclusions: ['node_modules', 'widgets']
+};
+
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -28,6 +32,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/checkDirectory', checkDirectoryRouter);
 app.use('/performAnalysis', (req, res, next) => {
     req.searchConfig = searchConfig; // Make searchConfig available in the request object
+    req.fileSearcherConfig = fileSearcherConfig;
     next();
 }, performAnalysisRouter);
 app.use('/', indexRouter);

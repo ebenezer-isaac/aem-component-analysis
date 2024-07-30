@@ -4,13 +4,6 @@ const FileSearcher = require('../utils/FileSearcher');
 const FilePathHandler = require('../utils/FilePathHandler');
 const fs = require('fs');
 
-// Configuration for FileSearcher
-const fileSearcherConfig = {
-    exclusions: ['node_modules', 'widgets']
-};
-
-const fileSearcher = new FileSearcher(fileSearcherConfig);
-
 // Cleaning functions dictionary
 const cleaningFunctions = {
     // Handles single values by trimming quotes
@@ -138,6 +131,8 @@ function transformDataForDataTables(data, headers) {
 router.post('/', async(req, res) => {
     const { location } = req.body;
     const searchConfig = req.searchConfig; // Retrieve searchConfig from request
+    const fileSearcherConfig = req.fileSearcherConfig;
+    const fileSearcher = new FileSearcher(fileSearcherConfig);
     const headers = new Set(); // Define headers here
 
     if (!location) {
