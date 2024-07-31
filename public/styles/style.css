@@ -22,3 +22,14 @@
 select {
     display: block;
 }
+
+table.dataTable tbody td {
+    white-space: nowrap;
+    /* Prevent line breaks */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dataTables_wrapper .dataTables_scrollBody {
+    overflow: auto;
+}

@@ -6,6 +6,22 @@ $(document).ready(function() {
     let currentHeaderValue = null;
     let defaultPageLength = 50; // Default page length
 
+    function adjustColumnWidths(tableId) {
+        const table = $(`#${tableId}`).DataTable();
+        const columns = table.columns();
+        columns.every(function() {
+            let maxWidth = 0;
+            this.nodes().to$().each(function() {
+                const cellWidth = $(this).outerWidth();
+                if (cellWidth > maxWidth) {
+                    maxWidth = cellWidth;
+                }
+            });
+            $(this.header()).css('width', maxWidth + 'px');
+            this.nodes().to$().css('width', maxWidth + 'px');
+        });
+    }
+
     function populateResultTable(pageLength) {
         const $tableBody = $('#resultTable tbody');
         $tableBody.empty();
@@ -18,18 +34,24 @@ $(document).ready(function() {
         // Define columns based on headers
         const columns = [
             { title: 'File Path' },
-            ...headers.map(header => ({ title: header }))
+            ...headers.map(header => ({
+                title: header,
+                render: function(data) {
+                    return data ? data.replace(/,/g, '<br>') : data;
+                }
+            }))
         ];
 
         if (resultTableInitialized) {
             $('#resultTable').DataTable().clear().destroy();
         }
 
-        $('#resultTable').DataTable({
+        const resultTable = $('#resultTable').DataTable({
             dom: 'Bfrtip',
             data: data,
             columns: columns,
             pageLength: pageLength, // Set page length
+            autoWidth: false, // Disable auto width calculation
             buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             search: {
                 caseInsensitive: false
@@ -38,6 +60,9 @@ $(document).ready(function() {
             scrollX: true,
             fixedColumns: {
                 leftColumns: 3
+            },
+            drawCallback: function() {
+                adjustColumnWidths('resultTable');
             }
         });
 
@@ -93,9 +118,9 @@ $(document).ready(function() {
         const rows = Object.entries(usageCount).map(([value, info]) => [
             value,
             info.count,
-            info.paths.join(', '),
-            info.titles.join(', '),
-            info.categories.join(', ')
+            info.paths.join(', ').replace(/,/g, '<br>'),
+            info.titles.join(', ').replace(/,/g, '<br>'),
+            info.categories.join(', ').replace(/,/g, '<br>')
         ]);
 
         const $tableBody = $('#usageCountTable tbody');
@@ -105,7 +130,7 @@ $(document).ready(function() {
             $('#usageCountTable').DataTable().clear().destroy();
         }
 
-        $('#usageCountTable').DataTable({
+        const usageCountTable = $('#usageCountTable').DataTable({
             dom: 'Bfrtip',
             data: rows,
             columns: [
@@ -116,6 +141,7 @@ $(document).ready(function() {
                 { title: 'Category' }
             ],
             pageLength: pageLength, // Set page length
+            autoWidth: false, // Disable auto width calculation
             buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             search: {
                 caseInsensitive: false // Make search case sensitive
@@ -124,6 +150,9 @@ $(document).ready(function() {
             scrollX: true,
             fixedColumns: {
                 leftColumns: 1
+            },
+            drawCallback: function() {
+                adjustColumnWidths('usageCountTable');
             }
         });
 
