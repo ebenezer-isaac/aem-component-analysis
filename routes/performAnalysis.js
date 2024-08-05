@@ -17,6 +17,15 @@ const cleaningFunctions = {
     tags: (match, pattern) => {
         const tagMatch = pattern.exec(match);
         return tagMatch ? tagMatch[1] : ''; // Extract the first capturing group
+    },
+    cleanClassName: (match, pattern) => {
+        try {
+            const regexResult = [...match.matchAll(pattern)];
+            return regexResult.map(result => result[0].replace(/[^a-zA-Z0-9-_]/g, '')).join(', '); // Remove unwanted characters
+        } catch (error) {
+            console.error('Error in cleanClassName:', error);
+            return '';
+        }
     }
 };
 

@@ -17,7 +17,8 @@ const searchConfig = {
         { key: 'caemTags', pattern: new RegExp('<(caem-[a-zA-Z0-9-]+)', 'g'), cleaning: 'tags', unique: true },
         { key: 'carbonImport', pattern: /.*carbonRequestAttributeHelper.*attributeName\s*=\s*['"]([^'"]+)['"][^"']*["']/g, cleaning: 'multipleQuotations', unique: true },
         { key: 'resourceType', pattern: new RegExp("resourceType\\s*=\\s*['\"\\s]([^'\"]+)['\"\\s]", 'g'), cleaning: 'multipleQuotations', unique: true },
-        { key: 'dynamicDataSlyUse', pattern: /data-sly-use\.\w+\s*=\s*["'](\/apps[^"']*)["']/g, cleaning: 'multipleQuotations', unique: true }
+        { key: 'dynamicDataSlyUse', pattern: /data-sly-use\.\w+\s*=\s*["'](\/apps[^"']*)["']/g, cleaning: 'multipleQuotations', unique: true },
+        { key: 'carbonClasses', pattern: new RegExp('\\b(?:bx--|dds--)[a-zA-Z0-9-_]+\\b', 'g'), cleaning: 'cleanClassName', unique: true }
     ]
 };
 
