@@ -6,22 +6,6 @@ $(document).ready(function() {
     let currentHeaderValue = null;
     let defaultPageLength = 50; // Default page length
 
-    function adjustColumnWidths(tableId) {
-        const table = $(`#${tableId}`).DataTable();
-        const columns = table.columns();
-        columns.every(function() {
-            let maxWidth = 0;
-            this.nodes().to$().each(function() {
-                const cellWidth = $(this).outerWidth();
-                if (cellWidth > maxWidth) {
-                    maxWidth = cellWidth;
-                }
-            });
-            $(this.header()).css('width', maxWidth + 'px');
-            this.nodes().to$().css('width', maxWidth + 'px');
-        });
-    }
-
     function populateResultTable(pageLength) {
         const $tableBody = $('#resultTable tbody');
         $tableBody.empty();
@@ -46,23 +30,21 @@ $(document).ready(function() {
             $('#resultTable').DataTable().clear().destroy();
         }
 
-        const resultTable = $('#resultTable').DataTable({
+        $('#resultTable').DataTable({
             dom: 'Bfrtip',
             data: data,
             columns: columns,
             pageLength: pageLength, // Set page length
-            autoWidth: false, // Disable auto width calculation
+            autoWidth: true, // Enable auto width calculation
             buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             search: {
                 caseInsensitive: false
             },
-            fixedHeader: true,
+            fixedHeader: true, // Make header sticky
             scrollX: true,
-            fixedColumns: {
-                leftColumns: 3
-            },
-            drawCallback: function() {
-                adjustColumnWidths('resultTable');
+            rowCallback: function(row, data) {
+                // Add tooltip to the row based on the first column's value
+                $(row).attr('title', data[0]);
             }
         });
 
@@ -130,7 +112,7 @@ $(document).ready(function() {
             $('#usageCountTable').DataTable().clear().destroy();
         }
 
-        const usageCountTable = $('#usageCountTable').DataTable({
+        $('#usageCountTable').DataTable({
             dom: 'Bfrtip',
             data: rows,
             columns: [
@@ -141,18 +123,16 @@ $(document).ready(function() {
                 { title: 'Category' }
             ],
             pageLength: pageLength, // Set page length
-            autoWidth: false, // Disable auto width calculation
+            autoWidth: true, // Enable auto width calculation
             buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             search: {
                 caseInsensitive: false // Make search case sensitive
             },
-            fixedHeader: true,
+            fixedHeader: true, // Make header sticky
             scrollX: true,
-            fixedColumns: {
-                leftColumns: 1
-            },
-            drawCallback: function() {
-                adjustColumnWidths('usageCountTable');
+            rowCallback: function(row, data) {
+                // Add tooltip to the row based on the first column's value
+                $(row).attr('title', data[0]);
             }
         });
 
